@@ -96,11 +96,15 @@ Inserte a continuación una captura de pantalla que muestre el resultado de ejec
 fichero `algebra/vectores.py` con la opción *verbosa*, de manera que se muestre el
 resultado de la ejecución de los tests unitarios.
 
+<img width="571" height="604" alt="image" src="https://github.com/user-attachments/assets/86e11bbb-40a9-4cbe-8e5c-c356987f313f" />
+
 #### Código desarrollado
 
 Inserte a continuación el código de los métodos desarrollados en esta tarea, usando los
 comandos necesarios para que se realice el realce sintáctico en Python del mismo (no
 vale insertar una imagen o una captura de pantalla, debe hacerse en formato *markdown*).
+
+
 
 #### Subida del resultado al repositorio GitHub y *pull-request*
 
