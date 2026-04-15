@@ -1,31 +1,7 @@
 """
-    Tercera tarea de APA - manejo de vectores
+APA - T3
 
-    Nombre y apellidos: Núria Rodríguez
-
-    En esta entrega queremos implementar las siguientes funciones: 
-    __mul__ y __rmul__ para realizar la multiplicación de vectores, 
-    __matmul__ y __rmatmul__ para realizar la multiplicación matricial de vectores, 
-    __floordiv__ y __rfloordiv__ para obtener el vector paralelo de un vector sobre otro y 
-    __mod__ y __rmod__ para obtener el vector perpendicular de un vector sobre otro. 
-
-    >>> v1 = Vector([1, 2, 3])
-    >>> v2 = Vector([4, 5, 6])
-    >>> v1 * 2
-    Vector([2, 4, 6])
-    >>> v1 * v2
-    Vector([4, 10, 18])
-
-    >>> v1 @ v2
-    32
-
-    >>> v1 = Vector([2, 1, 2])
-    >>> v2 = Vector([0.5, 1, 0.5])
-    >>> v1 // v2
-    Vector([1.0, 2.0, 1.0])
-
-    >>> v1 % v2
-    Vector([1.0, -1.0, 1.0])
+    Nel Penin Yele
 """
 
 class Vector:
@@ -109,101 +85,107 @@ class Vector:
 
         return -self + other
     
-    def __mul__(self, otro):
+    def  __mul__(self, other):
         """
-        Método que me permite multiplicar un vector por un mismo vector o una constante.
+        Método para dar un vector formado por la multiplicación elemento a elemento de dos vectores o multiplicar un vector por un número
+
         >>> v1 = Vector([1, 2, 3])
         >>> v2 = Vector([4, 5, 6])
-        >>> v1 * 2
-        Vector([2, 4, 6])
+
         >>> v1 * v2
         Vector([4, 10, 18])
-        """
-        if isinstance(otro, (int, float, complex)):
-            return Vector([elemento * otro for elemento in self])
-        else :
-            return Vector([num1*num2 for num1, num2 in zip(self, otro)]) # zip es un objeto que nos permite recorrer dos iterables al mismo tiempo
-        
-    __rmul__ = __mul__ # para que pueda multiplicar de manera commutativa los iterables con el vector
 
-    def __matmul__(self, otro):
+   
+        >>> v1 * 2
+        Vector([2, 4, 6])
+
         """
-        Metodo que me permite calcular el producto matricial de dos vectores.
+
+        if isinstance(other,(int, float, complex)):
+            return Vector(item * other for item in self)
+        else: 
+            return Vector(num1 * num2 for num1, num2 in zip(self, other))
+        
+    __rmul__ = __mul__
+    # igualamos __rmul__ a __mul__ porque la multiplicación es commutativa. 
+
+    def __matmul__(self, other):
+
+        """
+        Método para multiplicar matrices 
+
         >>> v1 = Vector([1, 2, 3])
         >>> v2 = Vector([4, 5, 6])
+
         >>> v1 @ v2
         32
         """
-        if not isinstance(otro, Vector):
-            raise TypeError("El producto matricial solo se puede realizar entre dos vectores")
+        if isinstance(other, Vector):
+            return sum(num1 * num2 for num1, num2 in zip(self, other))
         else:
-            return sum([num1*num2 for num1, num2 in zip(self, otro)])
+            raise TypeError("No se puede realizar la operación porque no es un vector")
     
-    def __rmatmul__(self, otro):
-        # si tenemos dos vectores directamente me hará __matmul__, en cambio, hay que especificar bien con los escalares ya que el usuario puede meter v1@2 o 2@v1.
+    def __rmatmul__(self, other):
         """
-        Metodo que me permite calcular el producto matricial de dos vectores.
+        Método para comprovar que en la otra posición, el otro elemento también es un vector, si lo es usará el método __mul__
+
         """
-        if not isinstance(otro, Vector): 
-            raise TypeError("El producto matricial solo se puede realizar entre dos vectores")
+        if isinstance(other, Vector):
+            return other @ self #reutiliza __mul__
+        else:
+            raise TypeError("No se puede realizar la operación porque no es un vector")
+        
+    def __floordiv__(self, other):
 
-
-    def __floordiv__(self, otro): 
         """
-        Metodo que me permite obtener el vector la componente tangencial (paralela) de v1 a v2 si v1 // v2.
-
-        Se puede demostrar:
-
-        v1 (componente tangencial) = ((v1//v2)/|v2|**2)*v2
+        Método que devuleve la componente v1 paralela a v2
 
         >>> v1 = Vector([2, 1, 2])
         >>> v2 = Vector([0.5, 1, 0.5])
+
         >>> v1 // v2
         Vector([1.0, 2.0, 1.0])
         """
-        if not isinstance(otro, Vector):
-            raise TypeError("No se puede proyectar un escalar sobre un vector.")
-        
-        else: 
-            producto_escalar = self @ otro
-            modulo = sum(a**2 for a in otro)
-            factor = producto_escalar / modulo
-            return Vector([num1 * factor for num1 in otro])
-    
-    def __rfloordiv__(self, otro):
-        # si tenemos dos vectores directamente me hará __floordiv__, en cambio, hay que especificar bien con los escalares ya que el usuario puede meter v1//2 o 2//v1.
-        """
-        Nos salta un error si intentamos utilizar // de un vector por un escalar.
-        """
-        if not isinstance(otro, Vector):
-            raise TypeError("No se puede proyectar un escalar sobre un vector.")
-        
-    def __mod__(self, otro):
-        """
-        Metodo que me permite obtener el vector normal (perpendicular) de un vector sobre otro vector
 
-        v1 (componente normal) = v1 - (v1//v2)
+        if isinstance(other, Vector):
+            factor = ( self @ other )/(other @ other)
+            return Vector(item * factor for item in other)
+        else:
+            raise TypeError("No se puede realizar la operación porque no es un vector")
+        
+    def __rfloordiv__(self, other):
+        """
+        Método para comprovar que el otro componente (v2) es un vector con el reflejado de __floordiv__
+        """
+        if isinstance(other, Vector):
+            return self // other #reutiliza __floordiv__
+        else:
+            raise TypeError("No se puede realizar la operación porque no es un vector")
+    
+        
+    def __mod__(self, other):
+        """
+        Método para calcular la componente normal de un vector (v1) respecto a otro vector(v2)
 
         >>> v1 = Vector([2, 1, 2])
         >>> v2 = Vector([0.5, 1, 0.5])
+
         >>> v1 % v2
         Vector([1.0, -1.0, 1.0])
         """
-
-        if not isinstance(otro, Vector):
-            raise TypeError("No se puede proyectar un escalar sobre un vector.")
-        else: 
-            tangencial = self // otro
-            return Vector([num1 - num2 for num1, num2 in zip(self, tangencial)])
+        if isinstance(other, Vector):
+            return Vector([num1 - num2 for num1, num2 in zip(self, self // other)])
+        else:
+            raise TypeError("No se puede realizar la operación porque no es un vector")
         
-    def __rmod__(self, otro): # si tenemos dos vectores directamente me hará __mod__, en cambio, hay que especificar bien con los escalares ya que el usuario puede meter v1%2 o 2%v1.
+    def __rmod__(self, other):
         """
-        Nos salta un error si intentamos utilizar // de un vector por un escalar.
+        Método para comprovar que en el reflejado de __mod__ el otro componente es un vector
         """
-        if not isinstance(otro, Vector): # isinstance(otro, Vector) → Devuelve True si otro es un Vector, False si no.
-            raise TypeError("No se puede proyectar un escalar sobre un vector.")
-        
-
+        if isinstance(other, Vector):
+            return self % other 
+ 
+ 
 if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+      import doctest
+      doctest.testmod()
